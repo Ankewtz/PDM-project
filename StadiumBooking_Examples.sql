@@ -25,36 +25,57 @@ JOIN Payment P ON E.Event_id = P.Event_id
 GROUP BY E.Event_id, E.Event_date, E.Event_type
 ORDER BY NumberOfCustomers DESC;
 
+-- Find all the seats that have not been selected by customers
+SELECT s.Seat_id, s.Zone, s.Price
+FROM Seat s
+WHERE s.Seat_id NOT IN (
+        SELECT
+            DISTINCT Seat_id
+        FROM
+            Payment
+    );
+
+
 -- Find the number of customers for each event and find the sum of money paid for each event:
 SELECT
-    E.Event_id,
-    E.Event_date,
-    E.Event_type,
-    COUNT(DISTINCT P.Customer_id) AS NumberOfCustomers,
-    SUM(P.TotalCost) AS TotalMoneyPaid
+    e.Event_id,
+    COUNT(DISTINCT c.Customer_id) AS NumberOfCustomers,
+    SUM(s.Price) AS TotalAmountPaid
 FROM
-    Event E
-JOIN
-    Payment P ON E.Event_id = P.Event_id
+    Event e
+LEFT JOIN
+    Payment p ON e.Event_id = p.Event_id
+LEFT JOIN
+    Seat s ON p.Seat_id = s.Seat_id
+LEFT JOIN
+    Customer c ON p.Customer_id = c.Customer_id
 GROUP BY
-    E.Event_id, E.Event_date, E.Event_type
+    e.Event_id
 ORDER BY
-    E.Event_id;
+    e.Event_id;
+
 
 
 -- List all people who have and have not paid for Event_id 2 and sort them by the money they paid
 SELECT
-    C.Customer_id,
-    C.Fullname,
-    COALESCE(SUM(P.TotalCost), 0) AS MoneyPaid
+    c.Customer_id,
+    c.Fullname,
+    COALESCE(SUM(s.Price), 0) AS TotalAmountPaid
 FROM
-    Customer C
+    Customer c
 LEFT JOIN
-    Payment P ON C.Customer_id = P.Customer_id AND P.Event_id = 2
+    Payment py ON c.Customer_id = py.Customer_id
+LEFT JOIN
+    Event e ON py.Event_id = e.Event_id
+LEFT JOIN
+    Seat s ON py.Seat_id = s.Seat_id
+WHERE
+    e.Event_id = 2 OR e.Event_id IS NULL
 GROUP BY
-    C.Customer_id, C.Fullname
+    c.Customer_id, c.Fullname
 ORDER BY
-    MoneyPaid DESC;
+    TotalAmountPaid DESC;
+
 
 -- Find the number of times each zone has been selected in all events and sort them in increasing order
 SELECT
@@ -70,22 +91,24 @@ ORDER BY
     NumberOfSelections ASC;
 
 -- Find the customers who paid the most money across all event:
-SELECT TOP 1
-    C.Customer_id,
-    C.Fullname,
-    C.Address,
-    C.Date_of_birth,
-    C.Email,
-    C.Phone_number,
-    SUM(P.TotalCost) AS TotalMoneyPaid
+SELECT
+    c.Customer_id,
+    c.Fullname,
+    SUM(s.Price) AS TotalAmountPaid
 FROM
-    Customer C
+    Customer c
 JOIN
-    Payment P ON C.Customer_id = P.Customer_id
+    Payment py ON c.Customer_id = py.Customer_id
+JOIN
+    Event e ON py.Event_id = e.Event_id
+JOIN
+    Seat s ON py.Seat_id = s.Seat_id
 GROUP BY
-    C.Customer_id, C.Fullname, C.Address, C.Date_of_birth, C.Email, C.Phone_number
+    c.Customer_id, c.Fullname
 ORDER BY
-    TotalMoneyPaid DESC;
+    TotalAmountPaid DESC;
+
+
 
 
 
