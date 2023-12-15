@@ -10,6 +10,12 @@ SELECT*FROM Seat;
 -- List all Payment:
 SELECT*FROM Payment;
 
+--List the payment details for Event_id 1 where the payment is completed
+SELECT p.Payment_id, p.Customer_id, p.Event_id, p.Seat_id, s.Price
+FROM Payment p
+JOIN Seat s ON p.Seat_id = s.Seat_id
+WHERE p.Event_id = 1 AND p.Payment_status = 'Completed';
+
 
 -- Find customers who have paid more than 1 event:
 SELECT C.Customer_id, C.Fullname, COUNT(DISTINCT P.Event_id) AS EventsPaidFor
