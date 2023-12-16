@@ -37,9 +37,9 @@ INSERT INTO Customer (Customer_id, Address, Date_of_birth, Email, Fullname, Phon
 
 INSERT INTO Event (Event_id, Event_date, Event_type)
 VALUES
-    (1, '2023-01-15', 'Conference'),
-    (2, '2023-02-28', 'Workshop'),
-    (3, '2023-03-10', 'Seminar');
+    (1, '2023-01-15', 'Vominam City Tournament'),
+    (2, '2023-02-28', 'U20 City Tennis Tournament'),
+    (3, '2023-03-10', 'BIG WAVE concert');
 
 INSERT INTO Seat (Seat_id, Zone, Price)
 VALUES
